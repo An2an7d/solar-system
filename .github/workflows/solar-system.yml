@@ -140,9 +140,19 @@ jobs:
               --dry-run=client \
               -o yaml | kubectl apply -f -
 
-        - name: Deploy to Dev Environment
+        - name: Check if deployment exists
+          id: check
           run: |
-            kubectl apply -f kubernetes/development
+            if kubectl -n ${{ vars.NAMESPACE }} get deployment solar-system >/dev/null 2>&1; then
+              echo "exists=true" >> $GITHUB_ENV
+            else
+              echo "exists=false" >> $GITHUB_ENV
+            fi
+
+        - name: Apply Kubernetes manifests
+          if: env.exists == 'false'
+          run: |
+            kubectl apply -f kubernetes/development/
 
         - name: Set App Ingress Host URL
           id: set-ingress-host-address
