@@ -166,7 +166,7 @@ jobs:
 
     integration-testing:
     name: Dev Integration Testing
-    needs: dev-deploy
+    needs: dev_deploy
     runs-on: ubuntu-latest
     steps:
       - name: Test `/live` Endpoint
