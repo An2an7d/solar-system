@@ -163,3 +163,15 @@ jobs:
 
         outputs:
           APP_INGRESS_URL: ${{ steps.set-ingress-host-address.outputs.APP_INGRESS_URL }}
+
+    integration-testing:
+    name: Dev Integration Testing
+    needs: dev-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test `/live` Endpoint
+        env:
+          URL: ${{ needs.dev-deploy.outputs.APP_INGRESS_URL }}
+        run: |
+          echo "Testing endpoint: https://$URL/live"
+          curl https://$URL/live -s -k | jq -r .status | grep -iq live
