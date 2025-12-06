@@ -143,3 +143,13 @@ jobs:
         - name: Deploy to Dev Environment
           run: |
             kubectl apply -f kubernetes/development
+
+        - name: Set App Ingress Host URL
+                id: set-ingress-host-address
+                run: |
+                  HOST=$(kubectl -n ${{ vars.NAMESPACE }} \
+                    get ingress -o jsonpath='{.items[0].spec.tls[0].hosts[0]}')
+                  echo "APP_INGRESS_URL=$HOST" >> "$GITHUB_OUTPUT"
+
+        outputs:
+          APP_INGRESS_URL: ${{ steps.set-ingress-host-address.outputs.APP_INGRESS_URL }}
