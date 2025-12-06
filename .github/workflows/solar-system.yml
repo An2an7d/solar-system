@@ -63,25 +63,48 @@ jobs:
                 path: coverage
                 retention-days: 5
 
-    containerization:
-        name: Containerization
-        needs: [unit-testing, code-coverage]
+    # containerization:
+    #     name: Containerization
+    #     needs: [unit-testing, code-coverage]
+    #     runs-on: ubuntu-latest
+
+    #     steps:
+    #         - name: Checkout Repository
+    #           uses: actions/checkout@v4
+
+    #         - name: Log in to Docker BHub
+    #           uses: docker/login-action@v3
+    #           with:
+    #             username: ${{vars.DOCKERHUB_USERNAME}}
+    #             password: ${{ secrets.DOCKERHUB_PASSWORD}}
+
+    #         - name: Build Docker Image
+    #           run: |
+    #             docker build -t an2an7d/actions_ci_pipeline:${{github.sha}} .
+
+    #         - name: Push Docker Image
+    #           run: |
+    #             docker push an2an7d/actions_ci_pipeline:${{github.sha}}
+    dev_deploy:
+        name: Deploy to kubernetes
         runs-on: ubuntu-latest
-
         steps:
-            - name: Checkout Repository
-              uses: actions/checkout@v4
+      - name: Checkout Repo
+        uses: actions/checkout@v4
 
-            - name: Log in to Docker BHub
-              uses: docker/login-action@v3
-              with:
-                username: ${{vars.DOCKERHUB_USERNAME}}
-                password: ${{ secrets.DOCKERHUB_PASSWORD}}
+      - name: Install kubectl CLI
+        uses: azure/setup-kubectl@v3
+        with:
+          version: '1.26.0'
+          
+      - name: Configure kubeconfig context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
 
-            - name: Build Docker Image
-              run: |
-                docker build -t an2an7d/actions_ci_pipeline:${{github.sha}} .
-
-            - name: Push Docker Image
-              run: |
-                docker push an2an7d/actions_ci_pipeline:${{github.sha}}
+      - name: Fetch Kubernetes Cluster Details
+        run: |
+          kubectl version --short
+          echo "------------------------------------------"
+          kubectl get nodes
