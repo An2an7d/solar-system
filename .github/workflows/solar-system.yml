@@ -91,6 +91,7 @@ jobs:
     
     dev_deploy:
         name: Deploy to kubernetes
+        needs: containerization
         runs-on: ubuntu-latest
         steps:
         - name: Checkout Repo
