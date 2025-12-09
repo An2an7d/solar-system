@@ -80,11 +80,11 @@ jobs:
 
             - name: Build Docker Image
               run: |
-                docker build -t an2an7d/actions_ci_pipeline:${{github.sha}} .
+                docker build -t ${{vars.DOCKERHUB_USERNAME}}/${{vars.DOCKER_REPO}}:${{github.sha}} .
 
             - name: Push Docker Image
               run: |
-                docker push an2an7d/actions_ci_pipeline:${{github.sha}}
+                docker push ${{vars.DOCKERHUB_USERNAME}}/${{vars.DOCKER_REPO}}:${{github.sha}}
     
     # dev_deploy:
     #     name: Deploy to kubernetes
@@ -149,4 +149,5 @@ jobs:
     #       if: env.exists == 'false'
     #       run: |
     #         kubectl apply -f kubernetes/development/
+
 
